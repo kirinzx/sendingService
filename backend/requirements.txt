@@ -1,0 +1,9 @@
+django==4.2.6
+djangorestframework==3.14.0
+Celery==5.3.4
+flower==2.0.1
+requests==2.28.2
+python-decouple==3.8
+psycopg2-binary==2.9.6
+redis==4.6.0
+eventlet==0.33.3

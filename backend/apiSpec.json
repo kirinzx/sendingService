@@ -1,0 +1,555 @@
+{
+    "openapi": "3.0.2",
+    "info": {
+        "title": "sendingService",
+        "version": "1.0"
+    },
+    "servers": [
+        {
+            "url": "http://127.0.0.1:8000"
+        }
+    ],
+    "paths": {
+        "/client/": {
+            "post": {
+                "summary": "Создание нового клиента",
+                "tags": [
+                    "Client"
+                ],
+                "operationId": "createClient",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#components/schemas/ClientForCreate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Успешное создание клиента",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#components/schemas/ClientForAnswer"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Ошибка в запросе",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#components/schemas/FieldErrors"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Все остальное"
+                    }
+                }
+            }
+        },
+        "/client/{phone_number}": {
+            "patch": {  
+                "summary": "Обновление атрибутов клиента",
+                "tags": [
+                    "Client"
+                ],
+                "operationId": "updateClient",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "phone_number",
+                        "required": true,
+                        "description": "Номер телефона клиента",
+                        "schema": {
+                            "type": "integer",
+                            "example": 79998887766
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "description": "Отправлять в body нужно только те атрибуты, которые вы собираетесь обновлять",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#components/schemas/ClientForCreate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Успешное обновление",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#components/schemas/ClientForAnswer"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Ошибка в запросе"
+                    },
+                    "404": {
+                        "description": "Клиент не найден"
+                    },
+                    "default": {
+                        "description": "Все остальное"
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Удаление клиента",
+                "operationId": "deleteClient",
+                "tags": [
+                    "Client"
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "phone_number",
+                        "required": true,
+                        "description": "Номер телефона клиента",
+                        "schema": {
+                            "type": "integer",
+                            "example": 79998887766
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Успешное удаление"
+                    },
+                    "404": {
+                        "description": "Клиент не найден"
+                    },
+                    "default": {
+                        "description": "Все остальное"
+                    }
+                }
+            }
+        },
+        "/sending/": {
+            "post": {
+                "summary": "Создание рассылки",
+                "operationId": "createSending",
+                "tags": [
+                    "Sending"
+                ],
+                "requestBody": {
+                    "description": "Оба(или один, или ноль) атрибута у client_filter могут быть null(None), в этом случае этот атрибут не будет учитываться",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#components/schemas/SendingForCreate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Успешное создание",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#components/schemas/SendingForAnswer"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Ошибка в запросе",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#components/schemas/FieldErrors"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Всё остальное"
+                    }
+                }
+            },
+            "get": {
+                "summary": "Получение общей статистики по рассылкам",
+                "operationId": "getGeneralInfo",
+                "tags": [
+                    "Sending"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Успешное получение статистики",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#components/schemas/SendingGeneral"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Всё остальное"
+                    }
+                }
+            }
+        },
+        "/sending/{pk}": {
+            "get": {
+                "summary": "Получение детальной статистики по рассылке",
+                "operationId": "getSpecificInfo",
+                "tags": [
+                    "Sending"
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "pk",
+                        "description": "Id рассылки",
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        },
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Успешное получение информации",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#components/schemas/SendingSpecific"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Всё остальное"
+                    }
+                }
+            },
+            "patch": {
+                "summary": "Обновление атрибутов рассылки",
+                "tags": [
+                    "Sending"
+                ],
+                "operationId": "updateSending",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "pk",
+                        "description": "Id рассылки",
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        },
+                        "required": true
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "description": "В body передаем лишь те данные, которые хотим обновить",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SendingForCreate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Успешное обновление рассылки"
+                    },
+                    "400": {
+                        "description": "Поля не прошли валидацию",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/FieldErrors"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Рассылка не найдена"
+                    },
+                    "default": {
+                        "description": "Всё остальное"
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Удаление рассылки",
+                "operationId": "deleteSending",
+                "tags": [
+                    "Sending"
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "pk",
+                        "description": "Id рассылки",
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        },
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Успешное удаление рассылки"
+                    },
+                    "404": {
+                        "description": "Рассылка не найдена"
+                    },
+                    "default": {
+                        "description": "Всё остальное"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "ClientFilter": {
+                "type": "object",
+                "description": "Оба(или один) атрибута могут быть null(None), в этом случае этот атрибут не будет учитываться",
+                "properties": {
+                    "tag": {
+                        "type": "string",
+                        "example": "customer"
+                    },
+                    "mob_operator_code": {
+                        "type": "string",
+                        "example": "900"
+                    }
+                }
+            },
+            "ClientForCreate": {
+                "type": "object",
+                "properties": {
+                    "phone_number": {
+                        "type": "integer",
+                        "example": 79991113322
+                    },
+                    "mob_operator_code": {
+                        "type": "string",
+                        "example": "999"
+                    },
+                    "tag": {
+                        "type": "string",
+                        "example": "customer"
+                    },
+                    "timezone": {
+                        "type": "string",
+                        "example": "Europe/Moscow"
+                    }
+                }
+            },
+            "ClientForAnswer": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "phone_number": {
+                        "type": "integer",
+                        "example": 79991113322
+                    },
+                    "mob_operator_code": {
+                        "type": "string",
+                        "example": "999"
+                    },
+                    "tag": {
+                        "type": "string",
+                        "example": "customer"
+                    },
+                    "timezone": {
+                        "type": "string",
+                        "example": "Europe/Moscow"
+                    }
+                }
+            },
+            "FieldErrors": {
+                "type": "object",
+                "properties": {
+                    "errors": {
+                        "type": "array",
+                        "items":{
+                            "type": "string",
+                            "example": "Неверный формат номера телефона"
+                        }
+                    }
+                }
+            },
+            "SendingForCreate": {
+                "type": "object",
+                "properties": {
+                    "message_text": {
+                        "type": "string",
+                        "example": "Всем привет!"
+                    },
+                    "start_date": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2023-11-25 18:00"
+                    },
+                    "end_date": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2023-11-25 19:00"
+                    },
+                    "client_filter": {
+                        "$ref": "#/components/schemas/ClientFilter"
+                    }
+                }
+            },
+            "SendingForAnswer": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "example": 1
+                    },
+                    "message_text": {
+                        "type": "string",
+                        "example": "Всем привет!"
+                    },
+                    "start_date": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2023-11-25 18:00"
+                    },
+                    "end_date": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2023-11-25 18:00"
+                    },
+                    "client_filter": {
+                        "$ref": "#/components/schemas/ClientFilter"
+                    }
+                }
+            },
+            "SendingGeneral": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1,
+                        "description": "id рассылки"
+                    },
+                    "total_messages": {
+                        "type": "integer",
+                        "example": 10,
+                        "description": "Общее кол-во сообщений в рассылке"
+                    },
+                    "sent": {
+                        "type": "integer",
+                        "example": 5,
+                        "description": "Кол-во доставленных сообщений"
+                    },
+                    "error": {
+                        "type": "integer",
+                        "example": 3,
+                        "description": "Кол-во недоставленных сообщений по причине ошибки"
+                    },
+                    "created": {
+                        "type": "integer",
+                        "example": 2,
+                        "description": "Кол-во созданных сообщений, но не отправленных(рассылку удалили и т.п.)"
+                    },
+                    "message_text": {
+                        "type": "string",
+                        "example": "Всем привет!"
+                    }
+                }
+            },
+            "Messages": {
+                "type": "object",
+                "properties": {
+                    "id":{
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "send_status": {
+                        "type": "string",
+                        "example": "Доставлено"
+                    },
+                    "created_date": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2023-11-25 18:00"
+                    },
+                    "client": {
+                        "$ref": "#/components/schemas/ClientForAnswer"
+                    }
+                }
+            },
+            "SendingSpecific": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "message_text": {
+                        "type": "integer",
+                        "example": "Всем привет!"
+                    },
+                    "start_date": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2023-11-25 18:00"
+                    },
+                    "end_date": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2023-11-25 19:00"
+                    },
+                    "client_filter": {
+                        "$ref": "#/components/schemas/ClientFilter"
+                    },
+                    "total_messages": {
+                        "type": "integer",
+                        "example": 10
+                    },
+                    "sent": {
+                        "type": "integer",
+                        "example": 5
+                    },
+                    "error": {
+                        "type": "integer",
+                        "example": 3
+                    },
+                    "created": {
+                        "type": "integer",
+                        "example": 2
+                    },
+                    "messages": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Messages"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
